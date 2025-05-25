@@ -6,13 +6,14 @@ dotenv.config();
 const envSchema = z.object({
     TELEGRAM_API_TOKEN: z.string(),
 
-    AGENT_URL: z.string().url(),
-    AGENT_TOKEN: z.string(),
+    GEMINI_API_TOKEN: z.string(),
 
-    BACKEND_URL: z.string().url(),
-    BACKEND_TOKEN: z.string(),
+    HF_TOKEN: z.string(),
+
+    DATABASE_URL: z.string().url(),
 });
 
-const env = envSchema.safeParse(process.env).data!;
+const env = envSchema.parse(process.env);
+
 
 export default env;
