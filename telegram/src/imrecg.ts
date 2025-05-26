@@ -28,7 +28,7 @@ Example Output:
 }
 `;
 
-export async function recognizeImage(imageBuffer: Buffer, mimeType: string): Promise<string> {
+export async function recognizeImage(imageBuffer: Buffer, mimeType: string): Promise<{ tags: string[], description: string }> {
     const randomUuid = uuidv4();
     const filePath = `./${randomUuid}`;
     await writeFile(filePath, imageBuffer);
@@ -55,5 +55,17 @@ export async function recognizeImage(imageBuffer: Buffer, mimeType: string): Pro
         name: file.name!
     });
 
-    return response.text!;
+    let responseText = response.text!;
+
+    if (responseText.startsWith('`') || responseText.startsWith('```') || responseText.startsWith('```json')) {
+        responseText = responseText.replace(/```json/g, '').replace(/```/g, '');
+    }
+
+    try {
+        const responseJson = JSON.parse(responseText);
+        return responseJson;
+    } catch (error) {
+        console.error("Failed to parse response:", response.text);
+        throw new Error("Invalid response format");
+    }
 }

@@ -37,7 +37,7 @@ export async function sessionSendMessage(userId: string, message: string): Promi
     const response = await session.chat.sendMessage({ message });
     let responseText = response.text!;
 
-    if(responseText.startsWith('`') || responseText.startsWith('```') || responseText.startsWith('```json')) {
+    if (responseText.startsWith('`') || responseText.startsWith('```') || responseText.startsWith('```json')) {
         responseText = responseText.replace(/```json/g, '').replace(/```/g, '');
 
     }
@@ -49,6 +49,18 @@ export async function sessionSendMessage(userId: string, message: string): Promi
         console.error("Failed to parse response:", responseText);
         throw new Error("Invalid response format");
     }
+}
+
+export async function attachLocation(userId: string, latitude: number, longitude: number): Promise<Answer> {
+    const session = getOrCreateSession(userId);
+    session.location = { latitude, longitude };
+    return await sessionSendMessage(userId, `[/INST] location submitted`);
+}
+
+export async function attachImage(userId: string, tags: string[], description: string, link: string): Promise<Answer> {
+    const session = getOrCreateSession(userId);
+    session.image = { tags, description, link };
+    return await sessionSendMessage(userId, `[/INST] Image submitted with tags: ${tags.join(", ")}, description: ${description}, link: ${link}`);
 }
 
 export function endSession(userId: string): void {
